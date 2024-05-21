@@ -1,0 +1,14 @@
+[tools]
+python = "3.11.9"
+
+[env]
+_.python.venv = { path = ".venv", create = true }
+
+[tasks."reset:venv"] 
+run = "rm -rf .venv"
+
+[tasks."run"]
+run = "python main.py"
+
+[tasks."default"]
+depends = ["run"]
