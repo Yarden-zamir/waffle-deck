@@ -165,7 +165,7 @@ if __name__ in {"__main__", "__mp_main__"}:
     print('Starting server')
     if ssl_certfile and ssl_keyfile:
         print('Starting server with SSL')
-        ui.run(host='0.0.0.0', port=443,,
+        ui.run(host='0.0.0.0', port=443,
                ssl_certfile=ssl_certfile, ssl_keyfile=ssl_keyfile)
     else:
         ui.run(host='0.0.0.0', port=80)
