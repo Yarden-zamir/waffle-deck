@@ -161,7 +161,7 @@ with CardGrid().classes('w-full'):
 
 ssl_certfile = getenv('SSL_CERTFILE', None)
 ssl_keyfile = getenv('SSL_KEYFILE', None)
-if __name__ == '__main__':
+if __name__ in {"__main__", "__mp_main__"}:
     print('Starting server')
     if ssl_certfile and ssl_keyfile:
         print('Starting server with SSL')
