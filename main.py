@@ -11,9 +11,9 @@ from nicegui.elements.stepper import Stepper
 from nicegui.elements.chat_message import ChatMessage
 
 client = OpenAI()
-waffle_file = open("waffle.json", "r")
+waffle_file = open("waffles.json", "r")
 waffle_data = json.load(waffle_file)
-user_name = getenv("USER_NAME", "User")
+user_name = getenv("USER_NAME","Random Person")
 
 class CardGrid(ui.grid):
     def __init__(self, **kwargs) -> None:
@@ -59,7 +59,7 @@ def get_image(waffle):
                 f.write(chunk)
 
     waffle["image"] = f"cache/{waffle['name']}.png"
-    with open("waffle.json", "w") as f:
+    with open("waffles.json", "w") as f:
         json.dump(waffle_data, f, indent=4)
     return waffle["image"]
 
@@ -97,19 +97,28 @@ def create_recipe_stepper():
         stepper.set_visibility(False)
         return stepper
 
-def view_waffle(waffle, components, visible_component_key):
+
+def view_component(waffle, components, component_key):
+    print(components["recipe"].visible)
     # Hide all components first
-    for component_key, component in components.items():
-        component.set_visibility(False)
+    protected_components = ["card"]
+    main_component = components["image"]
+    for key, component in components.items():
+        if key not in protected_components and key != "recipe":
+            component.set_visibility(False)
     # Show the specified component
-    if visible_component_key in components:
-        components[visible_component_key].set_visibility(True)
+    if components["recipe"].visible:
+        print('vis')
+        main_component.set_visibility(True)
+        components[component_key].set_visibility(False)
+    elif component_key in components:
+        components["recipe"].set_visibility(True)
 
 with ui.header(elevated=True):
-    ui.label(f"{user_name}'s Waffle Collection")
+    ui.label(f"{user_name}'s Waffle Deck")
 
 with ui.row().classes('w-full'):
-    chat = ui.chat_message(f'Hello {user_name}, Welcome to your waffle collection.', name='Waffle Assistant', stamp='Some time ago', avatar='https://robohash.org/waffle')
+    chat = ui.chat_message(f'Hello {user_name}! Welcome to your waffle-deck. Here you will produce, breed and and stage\n waffles against eachother to produce the ultimate waffle!', name='Waffle Assistant', stamp='Some time ago', avatar='https://robohash.org/waffle')
 
     ui.timer(1, lambda: get_random_fact(chat))
 
@@ -139,22 +148,15 @@ with CardGrid().classes('w-full'):
             components["image"] = ui.image(get_image(waffle))
             components["recipe"] = create_recipe_stepper()
             with ui.card_section().classes('flex'):
-                ui.chip("View", icon="ads_click", on_click=lambda waffle=waffle, components=components: view_waffle(waffle, components, "image"), color="blue")
-                ui.chip("Recipe", icon="book", on_click=lambda waffle=waffle, components=components: view_waffle(waffle, components, "recipe"), color="orange")
+                ui.chip("View", icon="ads_click", on_click=lambda waffle=waffle,
+                        components=components: view_component(waffle, components, "recipe"), color="blue")
+                ui.chip("Recipe", icon="book", on_click=lambda waffle=waffle, components=components: view_component(
+                    waffle, components, "recipe"), color="g")
+                ui.chip("Fight", icon="connect_without_contact", color="orange")
+                ui.chip("Breed", icon="favorite", color="green")
                 # Additional actions can be added here
                 ui.space()
                 ui.separator()
                 ui.label(waffle["description"])
-
-dt = datetime.now()
-
-def handle_connection():
-    global dt
-    dt = datetime.now()
-
-app.on_connect(handle_connection)
-
-label = ui.label()
-ui.timer(1, lambda: label.set_text(f'Last new connection: {dt:%H:%M:%S}'))
 
 ui.run()
