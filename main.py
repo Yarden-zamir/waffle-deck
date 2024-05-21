@@ -159,4 +159,7 @@ with CardGrid().classes('w-full'):
                 ui.separator()
                 ui.label(waffle["description"])
 
-ui.run(port=80)
+if getenv("PROD", "false"):
+    ui.run(port=80, ssl_certfile="cert.pem", ssl_keyfile="key.pem")
+else:
+    ui.run(port=80)
