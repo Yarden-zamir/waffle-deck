@@ -1,0 +1,45 @@
+{
+    "waffles": [
+        {
+            "name": "Captain Crunchberry Waffle the second 2",
+            "description": "Captain Crunchberry Waffle is a daring pirate waffle with a golden-brown crust and a sprinkle of colorful berry bits. He sails the syrupy seas on his ship, the \"Maple Marauder,\" always seeking the next big treasure hidden in breakfast buffets. With his trusty spatula sword and a patch over one blueberry eye, he\u2019s a legend in the breakfast world.",
+            "owned": true,
+            "stage": 0,
+            "color": "green"
+        },
+        {
+            "name": "Sir Sizzleton Waffle",
+            "description": "Sir Sizzleton Waffle is a noble, crispy waffle knight, donned in armor made of sizzling bacon strips. He defends the kingdom of Brunchland from the evil forces of Burnt Toast, wielding his sword of melted butter. His loyal steed, Pancake, is always by his side in their quest for the perfect brunch.",
+            "stage": 0,
+            "color": "red"
+        },
+        {
+            "name": "Princess Vanilla Bean Waffle",
+            "description": "Princess Vanilla Bean Waffle is a delicate and sweet waffle with a hint of vanilla, adorned with a crown of whipped cream and fresh fruit gems. She rules the kingdom of Sweetopia with kindness, ensuring every breakfast is filled with joy and flavor. Her magical powers can turn any plain dish into a delightful treat with just a sprinkle of her enchanted powdered sugar.",
+            "owned": true,
+            "stage": 0,
+            "color": "yellow"
+        },
+        {
+            "name": "Dr. Wafflestein",
+            "description": "Dr. Wafflestein is a quirky, eccentric waffle scientist with a lab coat made of powdered sugar and a pocket full of tiny, colorful marshmallows. He invents wacky breakfast contraptions in his syrupy laboratory, constantly experimenting with new flavors and textures. His latest creation, the \"Waffle-O-Matic,\" can turn any ingredient into a perfectly toasted waffle.",
+            "owned": true,
+            "stage": 0,
+            "color": "blue"
+        },
+        {
+            "name": "Jungle Waffle Jim",
+            "description": "Jungle Waffle Jim is an adventurous waffle explorer covered in a camouflage of tropical fruit slices and drizzled with coconut syrup. He swings through the breakfast jungle, discovering exotic flavors and hidden recipes. His sidekick, Banana Monkey, helps him navigate through the dense foliage of morning meals, always on the hunt for the next great breakfast adventure.",
+            "owned": true,
+            "stage": 0,
+            "color": "blue"
+        },
+        {
+            "name": "Hoppity Waffle",
+            "description": "Hoppity Waffle is a whimsical, fluffy waffle with a pair of bunny ears made from crispy bacon and a tail of whipped cream. She hops around the breakfast table, spreading cheer and a touch of maple syrup magic wherever she goes. Her favorite activity is hiding tiny chocolate eggs inside her waffle pockets for children to find during breakfast.",
+            "owned": true,
+            "stage": 0,
+            "color": "red("
+        }
+    ]
+}
