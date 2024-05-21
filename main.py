@@ -162,6 +162,7 @@ with CardGrid().classes('w-full'):
 ssl_certfile = getenv('SSL_CERTFILE', None)
 ssl_keyfile = getenv('SSL_KEYFILE', None)
 if ssl_certfile and ssl_keyfile:
+    print('Starting server with SSL')
     ui.run(port=80, ssl_certfile=ssl_certfile, ssl_keyfile=ssl_keyfile)
 else:
     ui.run(port=80)
