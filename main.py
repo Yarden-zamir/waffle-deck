@@ -159,4 +159,4 @@ with CardGrid().classes('w-full'):
                 ui.separator()
                 ui.label(waffle["description"])
 
-ui.run()
+ui.run(port=80)
