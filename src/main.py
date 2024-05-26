@@ -4,7 +4,7 @@ from datetime import datetime
 import random
 import json
 from os import getenv, path
-from nicegui import app, ui
+from nicegui import app, ui, run
 from openai import OpenAI
 from nicegui.elements.card import Card
 from nicegui.elements.image import Image
@@ -18,6 +18,17 @@ waffle_file = open("waffles.json", "r")
 waffle_data = json.load(waffle_file)
 user_name = getenv("USER_NAME", "Random Person")
 
+ui.add_head_html('''
+<script>
+    function setInputTextColor() {
+        var inputs = document.querySelectorAll('.custom-input input');
+        inputs.forEach(function(input) {
+            input.style.color = 'red';
+        });
+    }
+    document.addEventListener('DOMContentLoaded', setInputTextColor);
+</script>
+''')
 
 class CardGrid(ui.grid):
     def __init__(self, **kwargs) -> None:
@@ -203,27 +214,35 @@ class TodoItem:
 def load_card(color, id):
     # in the center
     with ui.row().classes('w-full h-full').classes('flex flex-col items-center justify-center'):
-        with ui.card().style(f'min-width: 38em; background: radial-gradient(circle, {colors[color]} 0%, #014a88 100%)'):
+        with ui.card().style(f'background: radial-gradient(circle, {colors[color]} 0%, #014a88 100%)').classes('w-96 max-[650px]:w-full'):
             # black almost transparent background
+            all_ingredients = []
             with ui.stepper().props('vertical').style('background: rgba(0, 0, 0, 0.2)').classes('w-full') as stepper:
                 with ui.step('New Waffle!'):
+                    ui.notify(f'Fresh {color} waffle token detected!',
+                              type='positive', position='top-left')
                     ui.label(get_alternate_phrasing(f'Fresh {color} waffle card detected! Would you like to start preparing it?')).style(
                         'color: white')
                     with ui.row().classes('w-full h-full').classes('flex flex-col items-center justify-center'):
                         ui.button(get_alternate_phrasing('Start waffle preparation'),
                                   on_click=lambda: stepper.next()).classes('font-bold')
                 with ui.step('Plan ingredients'):
-                    ui.spinner('audio', size='lg', color=color)
+                    ui.spinner('cube', size='20px', color=color,)
 
                     ingredients = ['Flour', 'Sugar', 'Eggs', 'Milk']
                     attempts = 3
 
                     def attempt(attempts) -> list[str]:
                         try:
-                            return json.loads(prompt('Come up with a whimsical list of ingredients for a fantasy waffle 4 ingredients respond in json like so {ingredients:[ "ingredient1", "ingedient2" ]}'))['ingredients']
+                            resp = prompt(
+                                'Come up with a whimsical list of ingredients for a fantasy waffle 5 ingredients respond in json like so {ingredients:[ "ingredient1", "ingedient2" ]}. You may use references from high quality pop media sometimes')
+                            assert type(resp) == str
+                            resp = resp.replace(
+                                "```json", "").replace("```", "")
+                            return json.loads(resp)['ingredients']
                         except:
                             print(
-                                f'failed to parse ingredients trying for {attempts} more times')
+                                f'failed to parse ingredients trying for {attempts} more times. Response: {resp}')
                             if attempts > 0:
                                 attempts -= 1
                                 return attempt(attempts)
@@ -231,11 +250,23 @@ def load_card(color, id):
                                 return ['Flour', 'Sugar', 'Eggs', 'Milk']
                     ingredients = attempt(attempts)
                     print(f'got ingredients {ingredients}')
-                    checkboxes = []
-
+                    checkboxes: list[ui.checkbox] = []
+                    manual_inputs: list[ui.input] = []
+                    all_ingredients = []
                     def on_checkbox_change():
                         if all(checkbox.value for checkbox in checkboxes):
+                            print('all ingredients are available')
+                            global all_ingredients
+                            all_ingredients = [
+                                checkbox.text for checkbox in checkboxes]
+                            all_ingredients.extend(
+                                [man_input.value for man_input in manual_inputs])
+                            ui.notify(f'All ingredients are available!',
+                                      type='positive', position='top-left')
+                            print(','.join([str(ingredient)
+                                  for ingredient in all_ingredients]))
                             stepper.next()
+
 
                     with ui.column():
                         for ingredient in ingredients[:random.randint(2, len(ingredients))]:
@@ -244,12 +275,24 @@ def load_card(color, id):
                             checkboxes.append(checkbox)
                         extra_ingredient = {'done': False, 'name': ''}
                         with ui.row().classes('items-center'):
-                            ui.checkbox(value=False).bind_value(
-                                extra_ingredient, 'done').style('color: white')
-                            ui.input(value=extra_ingredient['name']).classes(
-                                'flex-grow').bind_value(extra_ingredient, 'name').style('color: white')
-                with ui.step('Plan qualities'):
-                    ui.spinner('audio', size='lg', color=color)
+                            extra_ingredient_checkbox = ui.checkbox(value=False).on_value_change(on_checkbox_change).bind_value(
+                                extra_ingredient, 'done').style('margin-right: -1.3em')
+                            manual_inputs.append(ui.input(value=extra_ingredient['name']).classes(
+                                'flex-grow custom-input flex-grow').bind_value(extra_ingredient, 'name').style('color: white; background: rgba(255, 255, 255, 0.4); border-radius: 5px'))
+                            checkboxes.append(extra_ingredient_checkbox)
+                with ui.step('Develop backstory and personality'):
+                    async def waffle_personality_and_background(button: ui.button, all_ingredients: list[str] = all_ingredients):
+                        button.set_enabled(False)
+                        loading = ui.spinner('audio', size='lg', color=color)
+                        print(f'generating personality and background for waffle with ingredients {all_ingredients}')
+                        text = await run.io_bound(prompt, f'''
+                                    Loosely based on the ingredients in the list here {','.join([str(ingredient) for ingredient in all_ingredients])} come up with a whimsical backstory and personality for a fictional waffle, make it engaging and fun, make sure its short and sweet (two sentences), and make sure it has a personality
+                                    ''')
+                        ui.label(text).style('color: white')
+                        loading.delete()
+                        button.delete()
+                        
+                    button = ui.button('🧇', on_click=lambda:waffle_personality_and_background(button, all_ingredients) ).classes('font-bold') 
 
     # ui.label(f'Loading card {id} with color {color}')
     # ui.spinner('audio', size='lg', color='green')
